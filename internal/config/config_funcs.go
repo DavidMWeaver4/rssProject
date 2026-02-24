@@ -18,7 +18,7 @@ func Read() (Config, error){
 	}
 	defer file.Close()
 	var cfg Config
-	err := json.NewDecoder(file).Decode(&cfg)
+	err = json.NewDecoder(file).Decode(&cfg)
 	if err != nil{
 		return Config{}, err
 	}
@@ -46,7 +46,7 @@ func write(cfg Config) error {
 		return err
 	}
 	defer file.Close()
-	err := json.NewEncoder(file).Encode(&cfg)
+	err = json.NewEncoder(file).Encode(&cfg)
 	if err != nil{
 		return err
 	}
