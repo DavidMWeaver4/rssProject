@@ -6,7 +6,7 @@ import(
 	"github.com/google/uuid"
 	"github.com/DavidMWeaver4/rssProject/internal/database"
 )
-
+//logins a user
 func handlerLogin(s *state, cmd command) error{
 	if len(cmd.Args) == 0{
 		return fmt.Errorf("Username is required")
@@ -22,7 +22,7 @@ func handlerLogin(s *state, cmd command) error{
 	fmt.Println("Current username has been set")
 	return nil
 }
-
+//registers a new user
 func handlerRegister(s *state, name command)error{
 	if len(name.Args) == 0{
 		return fmt.Errorf("Name is required")
@@ -44,12 +44,27 @@ func handlerRegister(s *state, name command)error{
 	fmt.Println(user)
 	return nil
 }
-
+//resets the database
 func handlerReset(s *state, cmd command) error{
 	err := s.db.ResetUsers(context.Background())
 	if err != nil{
 		return err
 	}
 	fmt.Println("Database reset.")
+	return nil
+}
+
+func handlerUsers(s *state, cmd command) error{
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil{
+		return err
+	}
+	for _, user := range users{
+		if user == s.cfg.CurrentUserName{
+			fmt.Printf("* %s (current)\n", user)
+			continue
+		}
+		fmt.Printf("* %s\n", user)
+	}
 	return nil
 }
