@@ -1,26 +1,30 @@
 package main
-import(
-"github.com/DavidMWeaver4/rssProject/internal/config"
-"github.com/DavidMWeaver4/rssProject/internal/database"
-"database/sql"
-"log"
-"os"
+
+import (
+	"database/sql"
+	"log"
+	"os"
+
+	"github.com/DavidMWeaver4/rssProject/internal/config"
+	"github.com/DavidMWeaver4/rssProject/internal/database"
+
+	_ "github.com/lib/pq"
 )
-import _ "github.com/lib/pq"
-func main(){
+
+func main() {
 	//check paramenter length
-	if len(os.Args) < 2{
+	if len(os.Args) < 2 {
 		log.Fatal("Not enough arguments")
 		os.Exit(1)
 	}
 	//read config file
 	cfg, err := config.Read()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	//get database
 	db, err := sql.Open("postgres", cfg.DbUrl)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	//get commands
@@ -29,24 +33,28 @@ func main(){
 	dbQueries := database.New(db)
 	programState := &state{
 		cfg: &cfg,
-		db: dbQueries,
+		db:  dbQueries,
 	}
 	//handle commands
 	cmds := commands{
-		Handlers: make(map[string]func(*state, command)error),
+		Handlers: make(map[string]func(*state, command) error),
 	}
 	cmd := command{
 		Name: commandName,
 		Args: arguments,
 	}
+
+	//command registers
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
 	cmds.register("agg", handlerAgg)
+	cmds.register("addfeed", handlerAddFeed)
+	cmds.register("feeds", handlerFeeds)
 
 	err = cmds.run(programState, cmd)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 
