@@ -53,7 +53,7 @@ func handlerReset(s *state, cmd command) error{
 	fmt.Println("Database reset.")
 	return nil
 }
-
+//fetches the full list of user Names and shows current login
 func handlerUsers(s *state, cmd command) error{
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil{
@@ -66,5 +66,15 @@ func handlerUsers(s *state, cmd command) error{
 		}
 		fmt.Printf("* %s\n", user)
 	}
+	return nil
+}
+
+func handlerAgg(s *state, cmd command) error{
+	url := "https://www.wagslane.dev/index.xml"
+	feed, err := fetchFeed(context.Background(), url)
+	if err != nil{
+		return err
+	}
+	fmt.Printf("%+v\n",feed)
 	return nil
 }
