@@ -105,6 +105,16 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
+	_, err = s.db.CreateFeedFollows(context.Background(), database.CreateFeedFollowsParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return err
+	}
 	fmt.Printf("%+v\n", feed)
 	return nil
 }
@@ -126,6 +136,48 @@ func handlerFeeds(s *state, cmd command) error {
 			return err
 		}
 		fmt.Printf("Created By: %+v\n", name)
+	}
+	return nil
+}
+
+func handlerFollow(s *state, cmd command) error {
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("Missing Arguments")
+	}
+	feeds, err := s.db.GetFeedsFromURL(context.Background(), cmd.Args[0])
+	if err != nil {
+		return err
+	}
+	feedFollows, err := s.db.CreateFeedFollows(context.Background(), database.CreateFeedFollowsParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
+		FeedID:    feeds.ID,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Name: %s\n", feedFollows.UserID)
+	fmt.Printf("URL: %s\n", feedFollows.FeedID)
+	return nil
+}
+
+func handlerFollowing(s *state, cmd command) error {
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	feedFollows, err := s.db.GetFeedFollowForUser(context.Background(), user.ID)
+	if err != nil {
+		return err
+	}
+	for _, ff := range feedFollows {
+		fmt.Printf("%s\n", ff.FeedName)
 	}
 	return nil
 }
