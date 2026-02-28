@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/DavidMWeaver4/rssProject/internal/database"
@@ -180,6 +181,36 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 		return err
 	}
 	fmt.Println("Unfollowed!")
+	return nil
+}
+
+// browse the most recent posts for logged in user
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	var limit_param int32
+	var err error
+	if len(cmd.Args) == 2 {
+		temp, err := strconv.ParseInt(cmd.Args[1], 10, 32)
+		if err != nil {
+			return err
+		}
+		limit_param = int32(temp)
+	} else {
+		limit_param = 2
+	}
+	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit:  limit_param,
+	})
+	if err != nil {
+		return err
+	}
+	for _, post := range posts {
+		fmt.Printf("%s\n", post.Title)
+		if post.Description.Valid {
+			fmt.Printf("%s\n", post.Description.String)
+		}
+		fmt.Printf("%s\n", post.Url)
+	}
 	return nil
 }
 
