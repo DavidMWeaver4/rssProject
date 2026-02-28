@@ -11,7 +11,7 @@ import (
 
 // logins a user
 func handlerLogin(s *state, cmd command) error {
-	if len(cmd.Args) == 0 {
+	if len(cmd.Args) != 1 {
 		return fmt.Errorf("Username is required")
 	}
 	user, err := s.db.GetUser(context.Background(), cmd.Args[0])
@@ -72,17 +72,6 @@ func handlerUsers(s *state, cmd command) error {
 		}
 		fmt.Printf("* %s\n", user)
 	}
-	return nil
-}
-
-// fetches a xml post from a website
-func handlerAgg(s *state, cmd command) error {
-	url := "https://www.wagslane.dev/index.xml"
-	feed, err := fetchFeed(context.Background(), url)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%+v\n", feed)
 	return nil
 }
 

@@ -56,6 +56,7 @@ func main() {
 	cmds.register("following", middlewareLoggedIn(handlerFollowing))
 	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
 
+
 	err = cmds.run(programState, cmd)
 	if err != nil {
 		log.Fatal(err)
